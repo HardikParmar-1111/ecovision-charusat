@@ -18,6 +18,7 @@ import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import { EnvironmentalProvider } from './context/EnvironmentalContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
+<h1>DEPLOY VERSION: 24-MAR-TEST</h1>
 
 const AuthCheck = ({ children }) => {
     const { user, loading } = useAuth()
