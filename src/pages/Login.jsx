@@ -85,7 +85,7 @@ const Login = () => {
                         <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '700', fontSize: '0.85rem', color: 'var(--secondary)' }}>CHARUSAT Student ID</label>
                         <input
                             type="text"
-                            placeholder="e.g. 22IT010"
+                            placeholder="e.g. 25CS056"
                             className="input-field"
                             value={studentId}
                             onChange={(e) => setStudentId(e.target.value.toUpperCase())}

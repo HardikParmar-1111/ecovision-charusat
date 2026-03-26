@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEnvironmentalData } from '../context/EnvironmentalContext'
-import { Wind, Thermometer, Droplets, ArrowRight, ShieldCheck, AlertTriangle, Calendar, Sun, Cloud, Info, Bell } from 'lucide-react'
+import { Wind, Thermometer, Droplets, ArrowRight, ShieldCheck, AlertTriangle, Calendar, Sun, Cloud, Info, Bell, Zap, Leaf, Car, Trees, Home, TrendingDown, Target } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
@@ -43,6 +43,44 @@ const Dashboard = () => {
         { label: 'Ambient Temperature', value: temp, unit: '°C', icon: <Thermometer />, color: 'var(--primary)', path: '/weather' },
         { label: 'Current Humidity', value: humidity, unit: '%', icon: <Droplets />, color: '#0ea5e9', path: '/weather' }
     ]
+
+    // Sustainability Metrics Logic
+    const students = 7000;
+    const wastePerStudent = 0.1; // kg
+    const baseElectricity = 4500; // kWh/day
+    
+    let electricityAdj = 0;
+    let electricityNote = "";
+    if (temp > 35) {
+        electricityAdj = 0.3;
+        electricityNote = "Higher usage due to heat";
+    } else if (temp < 25) {
+        electricityAdj = -0.2;
+        electricityNote = "Reduced usage due to cooler weather";
+    }
+    
+    const estKwh = Math.round(baseElectricity * (1 + electricityAdj));
+    const electricityCo2 = estKwh * 0.82;
+    const transportCo2 = students * 5 * 0.12;
+    const wasteCo2 = (students * wastePerStudent) * 0.5;
+    const totalCo2 = Math.round(electricityCo2 + transportCo2 + wasteCo2);
+    
+    const co2Status = totalCo2 > 9000 ? "High" : totalCo2 > 8000 ? "Moderate" : "Low";
+    const co2Color = co2Status === "High" ? "var(--danger)" : co2Status === "Moderate" ? "var(--warning)" : "var(--accent)";
+
+    const carKmEquivalent = Math.round(totalCo2 * 5);
+    const treesRequired = Math.round(totalCo2 / 0.06);
+    const householdComp = Math.round(totalCo2 / 24.6);
+    const potentialSavings = Math.round(totalCo2 * 0.2);
+
+    const sustainabilitySuggestions = [
+        ...(temp > 35 ? ["Reduce AC usage", "Use ventilation", "Shift activities"] : []),
+        ...(aqi > 150 ? ["Limit generator usage", "Prefer indoor activities"] : []),
+        "Turn off unused lights",
+        "Optimize schedules",
+        "Encourage cycling"
+    ];
+
 
     return (
         <motion.div
@@ -269,7 +307,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginBottom: '3.5rem' }}>
                 <div className="card" style={{ background: 'var(--secondary)', color: 'white', overflow: 'hidden', position: 'relative' }}>
                     <div style={{ position: 'relative', zIndex: 1 }}>
                         <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '1rem' }}>Smart Campus Advisory</h2>
@@ -302,22 +340,123 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Global Attribution Footer */}
-            <footer style={{ marginTop: '5rem', padding: '2rem 0', borderTop: '1px solid var(--border)', textAlign: 'center' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        <Info size={14} /> Data: World Air Quality Index (WAQI)
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        <Info size={14} /> Weather: Open-Meteo High-Resolution Forecast (No API Key)
+            {/* Sustainability Overview Section */}
+            <div style={{ marginBottom: '3.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--secondary)' }}>
+                        <Leaf size={32} color="var(--accent)" /> Sustainability Overview
+                    </h2>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600', padding: '0.5rem 1rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}>
+                        Intelligence Mode: Impact Analysis
                     </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                    © {new Date().getFullYear()} CHARUSAT EcoVision – Smart Environmental Intelligence System for CHARUSAT University
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                    {/* Carbon Footprint Card */}
+                    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '0.8rem', borderRadius: '14px' }}>
+                                <TrendingDown size={24} color="var(--accent)" />
+                            </div>
+                            <div style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', background: co2Color, color: 'white', textTransform: 'uppercase' }}>
+                                {co2Status} Impact
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '0.5rem' }}>Total Carbon Footprint</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--secondary)', letterSpacing: '-1px' }}>
+                                {totalCo2.toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>kg CO₂/day</span>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            {['Electricity', 'Transport', 'Waste'].map(label => (
+                                <span key={label} style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.4rem 0.8rem', background: '#f1f5f9', color: 'var(--text-muted)', borderRadius: '8px' }}>
+                                    {label}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Electricity Usage Card */}
+                    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ background: 'rgba(14, 165, 233, 0.1)', padding: '0.8rem', borderRadius: '14px' }}>
+                                <Zap size={24} color="var(--primary)" />
+                            </div>
+                            {electricityNote && (
+                                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: electricityAdj > 0 ? 'var(--danger)' : 'var(--accent)' }}>
+                                    {electricityNote}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '0.5rem' }}>Est. Electricity Usage</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--secondary)', letterSpacing: '-1px' }}>
+                                {estKwh.toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>kWh/day</span>
+                            </div>
+                        </div>
+                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--secondary)' }}>Peak Usage:</span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>2 PM – 5 PM</span>
+                        </div>
+                    </div>
+
+                    {/* Smart Suggestions Card */}
+                    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.6rem', color: 'var(--secondary)' }}>
+                            <ShieldCheck size={20} color="var(--primary)" /> Smart Suggestions
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                            {sustainabilitySuggestions.map((tip, idx) => (
+                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '500' }}>
+                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)' }} />
+                                    {tip}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Reality Comparison Card */}
+                    <div className="card" style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '18px' }}><Car size={28} color="#64748b" /></div>
+                            <div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>Car Travel Equiv.</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{carKmEquivalent.toLocaleString()} km</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '18px' }}><Trees size={28} color="var(--accent)" /></div>
+                            <div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>Offset Trees</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{treesRequired.toLocaleString()} Mature Trees</div>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '18px' }}><Home size={28} color="var(--primary)" /></div>
+                            <div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>Home Powered</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{householdComp} Households</div>
+                            </div>
+                        </div>
+                        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '1.5rem', borderRadius: '20px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.4rem' }}>Target: 20% Reduction</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Target size={20} color="var(--primary)" /> Save {potentialSavings.toLocaleString()} kg/day
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </footer>
+                
+                <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}>
+                    <Info size={14} /> Values are estimated using environmental models for campus-scale impact analysis.
+                </div>
+            </div>
+
+
         </motion.div>
     )
 }
 
 export default Dashboard
+
